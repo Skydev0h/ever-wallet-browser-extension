@@ -1,5 +1,5 @@
 import TransportWebHID from '@ledgerhq/hw-transport-webhid'
-import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
+import TransportWebUSB from "@ledgerhq/hw-transport-webusb"
 
 import LedgerApp from './ledger-app'
 
@@ -31,7 +31,7 @@ export default class LedgerBridge {
                         await this.signTransaction(replyAction, params)
                         break
                     case 'ledger-close-bridge':
-                        await this.cleanUp(replyAction)
+                        await this.cleanUp(replyAction, true)
                         break
                 }
             }
@@ -43,24 +43,29 @@ export default class LedgerBridge {
     }
 
     async makeApp() {
-        try {
-            if (await TransportWebHID.isSupported())
-                this.transport = await TransportWebHID.create()
-            else if (await TransportWebUSB.isSupported())
-                this.transport = await TransportWebUSB.create()
-            else // noinspection ExceptionCaughtLocallyJS
-                throw new Error('No supported Ledger transport available')
-            this.app = new LedgerApp(this.transport)
-        } catch (e) {
-            console.log('LEDGER:::CREATE APP ERROR', e)
-            throw e
+        if (!this.transport || !this.app) {
+            try {
+                if (await TransportWebHID.isSupported())
+                    this.transport = await TransportWebHID.create()
+                else if (await TransportWebUSB.isSupported())
+                    this.transport = await TransportWebUSB.create()
+                else // noinspection ExceptionCaughtLocallyJS
+                    throw new Error('No supported Ledger transport available')
+                this.app = new LedgerApp(this.transport)
+                this.app = new LedgerApp(this.transport)
+            } catch (e) {
+                console.log('LEDGER:::CREATE APP ERROR', e)
+                throw e
+            }
         }
     }
 
-    async cleanUp(replyAction) {
-        this.app = null
-        if (this.transport) {
-            await this.transport.close()
+    async cleanUp(replyAction = null, close = false) {
+        if (close) {
+            this.app = null
+            if (this.transport) {
+                await this.transport.close()
+            }
         }
         if (replyAction) {
             this.sendMessageToExtension({
@@ -71,6 +76,7 @@ export default class LedgerBridge {
     }
 
     async getConfiguration(replyAction) {
+        let error = false
         try {
             await this.makeApp()
             const res = await this.app.getConfiguration()
@@ -86,12 +92,14 @@ export default class LedgerBridge {
                 success: false,
                 error: new Error(e.toString()),
             })
+            error = true
         } finally {
-            await this.cleanUp()
+            await this.cleanUp(null, error)
         }
     }
 
     async getPublicKey(replyAction, params) {
+        let error = false
         try {
             await this.makeApp()
             const res = await this.app.getPublicKey(params)
@@ -107,12 +115,14 @@ export default class LedgerBridge {
                 success: false,
                 error: new Error(e.toString()),
             })
+            error = true
         } finally {
-            await this.cleanUp()
+            await this.cleanUp(null, error)
         }
     }
 
     async getAddress(replyAction, params) {
+        let error = false
         try {
             await this.makeApp()
             const res = await this.app.getAddress(params)
@@ -128,12 +138,14 @@ export default class LedgerBridge {
                 success: false,
                 error: new Error(e.toString()),
             })
+            error = true
         } finally {
-            await this.cleanUp()
+            await this.cleanUp(null, error)
         }
     }
 
     async signMessage(replyAction, params) {
+        let error = false
         try {
             await this.makeApp()
 
@@ -150,12 +162,14 @@ export default class LedgerBridge {
                 success: false,
                 error: new Error(e.toString()),
             })
+            error = true
         } finally {
-            await this.cleanUp()
+            await this.cleanUp(null, error)
         }
     }
 
     async signTransaction(replyAction, params) {
+        let error = false
         try {
             await this.makeApp()
 
@@ -172,8 +186,9 @@ export default class LedgerBridge {
                 success: false,
                 error: new Error(e.toString()),
             })
+            error = true
         } finally {
-            await this.cleanUp()
+            await this.cleanUp(null, error)
         }
     }
 
