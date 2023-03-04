@@ -210,6 +210,11 @@ module.exports = [
                 chunks: ['phishing'],
                 filename: 'phishing-warning.html',
             }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    { from: "../dist-ledger", to: "everscale-ledger-bridge" }
+                ]
+            })
         ],
     }),
 ];

@@ -4,5 +4,6 @@
 .npmrc
 node_modules
 dist
+dist-ledger
 release
 tmp

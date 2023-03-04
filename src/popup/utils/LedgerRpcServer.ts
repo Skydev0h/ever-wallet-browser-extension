@@ -71,7 +71,9 @@ export class LedgerRpcServer {
         }
 
         const eventListener = ({ origin, data }: MessageEvent) => {
-            if (origin !== this.getOrigin()) {
+            /* Chrome extension origin will be chrome-extension://...
+            If using Kiwi browser, it will be kiwi-extension:// */
+            if (origin.indexOf('-extension://') === -1) {
                 reject(new NekotonRpcError(RpcErrorCode.INTERNAL, 'Invalid origin'))
             }
             else if (data?.action !== `${message.action}-reply`) {
@@ -86,9 +88,5 @@ export class LedgerRpcServer {
 
         this.iframe?.contentWindow?.postMessage(message, '*')
     })
-
-    private getOrigin() {
-        return new URL(LEDGER_BRIDGE_URL).origin
-    }
 
 }

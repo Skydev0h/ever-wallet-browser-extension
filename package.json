@@ -3,13 +3,14 @@
   "version": "0.3.20",
   "description": "EVER Wallet browser extension",
   "scripts": {
-    "start": "webpack --mode=development --watch --stats-error-details --env beta",
-    "build:prod": "webpack --mode=production",
-    "build:beta": "webpack --mode=production --env beta",
+    "start": "npm run ledger-build && webpack --mode=development --watch --stats-error-details --env beta",
+    "build:prod": "npm run ledger-build && webpack --mode=production",
+    "build:beta": "npm run ledger-build && webpack --mode=production --env beta",
     "release:prod": "npm run build:prod && npm run compress -- -v prod",
     "release:beta": "npm run build:beta && npm run compress -- -v beta",
     "release": "rm -rf release && npm run release:beta && npm run release:prod",
-    "compress": "sh ./build/build.sh"
+    "compress": "sh ./build/build.sh",
+    "ledger-build": "vite build"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,8 @@
   "dependencies": {
     "@broxus/await-semaphore": "^0.1.5",
     "@broxus/ever-wallet-wasm": "^0.1.27",
+    "@ledgerhq/hw-transport": "^6.28.1",
+    "@ledgerhq/hw-transport-webhid": "^6.27.12",
     "bignumber.js": "^9.1.1",
     "buffer": "^6.0.3",
     "classnames": "^2.3.2",
@@ -62,6 +65,7 @@
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.19.1",
     "@broxus/eslint-config": "^2.0.0",
     "@svgr/webpack": "^6.5.1",
     "@types/chrome": "^0.0.218",
@@ -93,6 +97,7 @@
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.5",
+    "vite": "^4.1.4",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
   },
