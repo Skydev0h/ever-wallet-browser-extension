@@ -23,6 +23,7 @@
     "@broxus/ever-wallet-wasm": "^0.1.27",
     "@ledgerhq/hw-transport": "^6.28.1",
     "@ledgerhq/hw-transport-webhid": "^6.27.12",
+    "@ledgerhq/hw-transport-webusb": "^6.27.12",
     "bignumber.js": "^9.1.1",
     "buffer": "^6.0.3",
     "classnames": "^2.3.2",

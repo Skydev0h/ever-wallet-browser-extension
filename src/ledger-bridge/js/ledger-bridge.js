@@ -1,4 +1,5 @@
 import TransportWebHID from '@ledgerhq/hw-transport-webhid'
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 
 import LedgerApp from './ledger-app'
 
@@ -43,7 +44,12 @@ export default class LedgerBridge {
 
     async makeApp() {
         try {
-            this.transport = await TransportWebHID.create()
+            if (await TransportWebHID.isSupported())
+                this.transport = await TransportWebHID.create()
+            else if (await TransportWebUSB.isSupported())
+                this.transport = await TransportWebUSB.create()
+            else // noinspection ExceptionCaughtLocallyJS
+                throw new Error('No supported Ledger transport available')
             this.app = new LedgerApp(this.transport)
         } catch (e) {
             console.log('LEDGER:::CREATE APP ERROR', e)
