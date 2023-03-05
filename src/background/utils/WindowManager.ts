@@ -1,7 +1,7 @@
 import browser, { Windows } from 'webextension-polyfill'
 
 import type { WindowGroup } from '@app/models'
-import { focusWindow, getAllWindows, getLastFocused } from '@app/shared'
+import {closeWindow, focusWindow, getAllWindows, getLastFocused} from '@app/shared'
 
 const NOTIFICATION_HEIGHT = 620
 const NOTIFICATION_WIDTH = 400
@@ -81,6 +81,23 @@ export class WindowManager {
             const windows = await getAllWindows()
             for (const window of windows) {
                 if (window.type !== 'popup' || window.id == null) {
+                    continue
+                }
+
+                let found_tab: boolean = false
+
+                if (window.tabs !== undefined) {
+                    for (const tab of window.tabs) {
+                        if (tab.windowId === window.id)
+                            found_tab = true
+                    }
+                } else {
+                    found_tab = true  // failover
+                }
+
+                if (!found_tab) {
+                    // window has no tabs, possibly lingering windows bug in Kiwi
+                    await closeWindow(window.id)
                     continue
                 }
 

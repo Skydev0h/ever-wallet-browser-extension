@@ -10,13 +10,15 @@ import {
     ENVIRONMENT_TYPE_POPUP,
 } from './constants'
 
+export const closeWindow = (id: number): Promise<void> => browser.windows.remove(id)
+
 export const focusTab = (tabId: number | string): Promise<Tabs.Tab> => browser.tabs.update(+tabId, { active: true })
 
 export const focusWindow = (id: number): Promise<Windows.Window> => browser.windows.update(id, { focused: true })
 
 export const getLastFocused = (): Promise<Windows.Window> => browser.windows.getLastFocused()
 
-export const getAllWindows = (): Promise<Windows.Window[]> => browser.windows.getAll()
+export const getAllWindows = (): Promise<Windows.Window[]> => browser.windows.getAll({populate: true})
 
 export const openExtensionInBrowser = async (route?: string, query?: string) => {
     let extensionUrl = browser.runtime.getURL('home.html')
